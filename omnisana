@@ -18,7 +18,7 @@ class OptparseExample
     # The options specified on the command line will be collected in *options*.
     # We set default values here.
     options = OpenStruct.new
-    options.library = []
+    options.special_projects = []
     options.config_file = ""
     options.api_key  = ""
     options.inplace = false
@@ -63,6 +63,11 @@ class OptparseExample
       opts.on("-o", "--out",
               "OmniFocus -> Asana. Sync your data Out from OmniFocus to Asana.") do |k|
         options.sync_out = true
+      end
+
+      # List of arguments.
+      opts.on("--special-projects x,y,z", Array, "Projects to import if assigned to noone.") do |list|
+        options.special_projects = list
       end
 
       opts.on("-d", "--debug",
@@ -150,3 +155,5 @@ options = OptparseExample.parse(ARGV)
 # pp ARGV
 
 Omnisana::Syncer.new( options: options ).execute!
+
+result = %x{osascript -e 'display notification "Syncing complete" with title "Omnisana Sync Complete"'}
