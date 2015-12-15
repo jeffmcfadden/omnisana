@@ -7,7 +7,7 @@ module Omnisana
     attr_accessor :sync_in
     attr_accessor :sync_out
     attr_accessor :config_file
-    attr_accessor: client
+    attr_accessor :client
 
     def initialize( options: {} )
       # Defaults:
@@ -20,6 +20,8 @@ module Omnisana
 
       if self.config_file.present?
         puts "TODO: implement config file"
+
+        options = YAML.load_file( self.config_file ).symbolize_keys
       end
 
       self.verbose       = options[:verbose] if options[:verbose].present?
@@ -28,7 +30,7 @@ module Omnisana
       self.sync_in       = options[:sync_in] if options[:sync_in].present?
       self.sync_out      = options[:sync_out] if options[:sync_out].present?
 
-      self.client = Omnisana::Client.new( self.asana_api_key )
+      self.client = Omnisana::Client.new( api_key: self.asana_api_key )
     end
 
     def execute!
