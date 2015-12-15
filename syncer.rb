@@ -23,6 +23,7 @@ module Omnisana
       self.special_projects = []
 
       self.debug            = options[:debug] if options[:debug].present?
+      options[:verbose]     = true if self.debug
 
       self.config_file   = options[:config_file] if options[:config_file].present?
 
