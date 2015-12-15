@@ -10,6 +10,8 @@ module Omnisana
     attr_accessor :api_key
 
     def initialize( api_key: "" )
+      puts "API Key: #{api_key}"
+
       self.api_key = api_key
     end
 

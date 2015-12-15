@@ -46,7 +46,7 @@ class OptparseExample
       # end
 
       opts.on("-c", "--config FILE",
-              "Read configuration from FILE") do |f|
+              "Read configuration from FILE. Note, command line values override config values!") do |f|
         options.config_file << f
       end
 

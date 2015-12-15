@@ -1,3 +1,5 @@
+require 'yaml'
+
 module Omnisana
   class Syncer
 
@@ -18,15 +20,16 @@ module Omnisana
       self.sync_in       = false
       self.sync_out      = false
 
-      if self.config_file.present?
-        puts "TODO: implement config file"
+      self.config_file   = options[:config_file] if options[:config_file].present?
 
-        options = YAML.load_file( self.config_file ).symbolize_keys
+      if self.config_file.present?
+        config_options = YAML.load_file( self.config_file ).symbolize_keys
+        options = config_options.merge( options.to_h ){ |k, old, new| new.present? ? new : old }
       end
 
       self.verbose       = options[:verbose] if options[:verbose].present?
       self.debug         = options[:debug] if options[:debug].present?
-      self.asana_api_key = options[:asana_api_key] if options[:asana_api_key].present?
+      self.asana_api_key = options[:api_key] if options[:api_key].present?
       self.sync_in       = options[:sync_in] if options[:sync_in].present?
       self.sync_out      = options[:sync_out] if options[:sync_out].present?
 
