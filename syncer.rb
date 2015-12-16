@@ -80,6 +80,8 @@ module Omnisana
           end
 
           project.tasks.each do |task|
+            next if task.name[-1] == ":" #Skip those things that are just sections.
+
             if task.assignee == me || ( task.assignee.nil? && self.special_projects.include?(project.id.to_s) )
               puts "\t\t#{task.completed? ? 'X' : ' '} #{task.id} :: #{task.section_and_name}"  if self.verbose
 
