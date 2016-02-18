@@ -57,6 +57,32 @@
 #   result
 # end
 
+def get_all_task_data_from_omnifocus
+  script = %Q{
+    tell application "OmniFocus"
+    	tell default document
+  		  set taskData to ""
+
+    		tell first document window
+    			set perspective name to "Asana Tasks"
+
+    			set theTasks to tree of content
+    			set oTrees to trees of content
+    			set n to count of oTrees
+    			repeat with i from 1 to count of oTrees
+    				set t to value of (item i of oTrees)
+  					set taskData to taskData & (due date of t as string) & "||" & (completed of t as string) & "||" & (note of t) & "$$"
+    			end repeat
+    		end tell
+    		return taskData
+    	end tell
+    end tell
+    }
+
+  exists = %x{osascript -e '#{script}'}
+end
+
+
 def project_exists_in_of(project)
   script = %Q{
     tell application "OmniFocus"

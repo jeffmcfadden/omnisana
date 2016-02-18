@@ -62,6 +62,8 @@ module Omnisana
 
       data = JSON.parse( self.query_api( '/tasks' + qs ) )
 
+      #puts "JSON Data: #{data}"
+
       tasks = []
       data['data'].each do |task_json_data|
 
@@ -96,11 +98,24 @@ module Omnisana
 
       req = Net::HTTP::Put.new(uri)
       req.basic_auth self.api_key, ''
-      req.set_form_data( completed: task.completed )
+
+      post_data = { completed: (task.completed ? "true" : "false") }
+
+      if task.completed
+        print "  X"
+      end
+
+      if task.due_date.present?
+        post_data[:due_at] = task.due_date.utc.iso8601
+      end
+
+      req.set_form_data( post_data )
 
       res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true ) {|http|
         http.request(req)
       }
+
+      # puts res.body
 
       res.body
     end
@@ -150,6 +165,8 @@ module Omnisana
     end
 
     def ==(u)
+      puts "u: #{u}, self: #{self}"
+
       u.id.to_s == self.id.to_s
     end
   end
@@ -201,6 +218,15 @@ module Omnisana
     def initialize( params, client: nil )
       params.each do |k,v|
         if self.respond_to?( "#{k}=".to_sym )
+
+          if v.class == String
+            if v === "false"
+              v = false
+            elsif v === "true"
+              v = true
+            end
+          end
+
           self.send( "#{k}=".to_sym, v )
         end
       end

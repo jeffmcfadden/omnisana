@@ -62,7 +62,7 @@ module Omnisana
 
       me = client.me
 
-      puts "Me:\n#{me.id}" if self.debug
+      puts "Me: #{me.id}" if self.debug
 
       client.workspaces.each do |workspace|
 
@@ -79,10 +79,16 @@ module Omnisana
             create_project_in_of( project )
           end
 
+          puts "Processing tasks" if self.debug
+
           project.tasks.each do |task|
+            puts "Task #{task}" if self.debug
+
             next if task.name[-1] == ":" #Skip those things that are just sections.
 
-            if task.assignee == me || ( task.assignee.nil? && self.special_projects.include?(project.id.to_s) )
+            puts "Assignee:\n#{task.assignee}" if self.debug
+
+            if (task.assignee && task.assignee == me) || ( task.assignee.nil? && self.special_projects.include?(project.id.to_s) )
               puts "\t\t#{task.completed? ? 'X' : ' '} #{task.id} :: #{task.section_and_name}"  if self.verbose
 
               if task.completed?
@@ -117,7 +123,31 @@ module Omnisana
     end
 
     def sync_omnifocus_to_asana
-      puts "sync_omnifocus_to_asana"
+      puts "sync_omnifocus_to_asana"  if self.verbose
+
+      data = get_all_task_data_from_omnifocus
+
+      data.split( "$$" ).each do |record|
+        fields = record.split( "||" )
+
+        match = /Asana Task (\d+)/.match( fields.last )
+
+        if match.nil?
+        else
+          id  = match[1]
+        end
+
+        due_date_string = fields[0]
+        completed = fields[1]
+
+        if id.to_i != 0
+          print "Updating #{id}"
+          task = Omnisana::Task.new( { id: id, completed: completed, due_at: due_date_string } )
+          client.update_task( task )
+          print "\n"
+        end
+
+      end
     end
 
   end
